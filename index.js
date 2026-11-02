@@ -59,6 +59,35 @@ app.get('/my-listing/:email', async(req, res) => {
 })
 
 
+app.get('/studios/edit/:id', async(req, res) => {
+    const id = req.params.id
+    console.log(id)
+    const result = await studios.findOne({_id: new ObjectId(id)})
+    if(result){
+        res.send(result)
+    }else{
+        res.send({message: 'No data found!'})
+    }
+})
+
+app.patch("/studios/edit/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  const updateUser = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      ...updateUser
+    },
+  };
+  console.log(updateDoc)
+
+  const result = await studios.updateOne(query, updateDoc);
+  console.log(result)
+
+  res.send(result);
+});
+
 app.delete('/delete/:id', async(req, res) => {
     const id = req.params.id
     const query = { _id: new ObjectId(id) };
