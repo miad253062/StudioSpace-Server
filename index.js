@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors"
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import "dotenv/config";
 
 
@@ -51,6 +51,21 @@ app.get('/studios', async(req, res) => {
     }
 });
 
+app.get('/my-listing/:email', async(req, res) => {
+    const userEmail = req.params.email
+    console.log(userEmail)
+    const result = await studios.find({email: userEmail}).toArray()
+    res.send(result)
+})
+
+
+app.delete('/delete/:id', async(req, res) => {
+    const id = req.params.id
+    const query = { _id: new ObjectId(id) };
+    const result = await studios.deleteOne(query)
+    res.send(result)
+})
+
 
 
 app.get('/feature', async(req, res)=> {
@@ -58,6 +73,13 @@ app.get('/feature', async(req, res)=> {
     res.send(featured)
 })
 
+
+app.post('/add-studio', async(req, res) => {
+    const newData = req.body;
+    const adddata = await studios.insertOne(newData)
+    console.log('New Studio', adddata.insertedId)
+    res.send(adddata)
+})
 
 app.listen(PORT, ()=> {
     console.log('server running at port', PORT)
