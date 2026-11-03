@@ -70,6 +70,16 @@ app.get('/studios/edit/:id', async(req, res) => {
     }
 })
 
+app.get('/studios/:id', async(req, res)=> {
+    const id = req.params.id
+    const result = await studios.findOne({_id: new ObjectId(id)})
+    if(result){
+        res.send(result)
+    }else{
+        res.send({message: 'No data found!'})
+    }
+})
+
 app.patch("/studios/edit/:id", async (req, res) => {
   const id = req.params.id;
   console.log(id)
@@ -101,6 +111,8 @@ app.get('/feature', async(req, res)=> {
     const featured = await studios.find({}).sort({rating: -1}).limit(6).toArray()
     res.send(featured)
 })
+
+
 
 
 app.post('/add-studio', async(req, res) => {
