@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import { MongoClient, ObjectId } from "mongodb";
 import "dotenv/config";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 
 const app = express()
@@ -35,6 +36,28 @@ app.get('/', (req, res) => {
     res.send('hello world')
 })
 
+
+const verifyApi = async(req, res, next) => {
+
+    const authHeader = req.headers.authorization;
+    console.log('authorized', authHeader)
+
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('No token found in request headers');
+        return res.status(401).send({ message: 'Unauthorized access: Token missing' });
+    }
+    const token = authHeader.split(' ')[1];
+    const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`))
+     
+
+    try {
+        const {payload} = await jwtVerify(token, JWKS)
+        next(); 
+    } catch (error) {
+        return res.status(401).send({ message: 'Unauthorized access: Invalid token' });
+    }
+};
 
 app.get('/studios', async(req, res) => {
     try {
@@ -118,7 +141,7 @@ app.patch("/status/:id", async (req, res) => {
   res.send(result);
 });
 
-app.delete('/delete/:id', async(req, res) => {
+app.delete('/delete/:id', verifyApi, async(req, res) => {
     const id = req.params.id
     const query = { _id: new ObjectId(id) };
     const result = await studios.deleteOne(query)
@@ -148,14 +171,14 @@ app.get('/bookings/:email', async(req, res)=> {
 
 
 
-app.post('/add-studio', async(req, res) => {
+app.post('/add-studio',verifyApi,  async(req, res) => {
     const newData = req.body;
     const adddata = await studios.insertOne(newData)
     console.log('New Studio', adddata.insertedId)
     res.send(adddata)
 })
 
-app.post('/bookings', async(req, res) => {
+app.post('/bookings', verifyApi, async(req, res) => {
     const bookingData = req.body;
     const exists = await bookings.findOne({ 
         email: bookingData.email, 
