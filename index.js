@@ -155,16 +155,21 @@ app.post('/add-studio', async(req, res) => {
     res.send(adddata)
 })
 
-app.post('/bookings', async(req, res)=> {
+app.post('/bookings', async(req, res) => {
     const bookingData = req.body;
-    const exits = bookings.find({_id: new ObjectId(bookingData._id)})
-    if(exits && bookingData.status !== 'pending'){
-        return res.send({message: 'Data already exists!'})
+    const exists = await bookings.findOne({ 
+        email: bookingData.email, 
+        'studio._id': bookingData.studio._id, 
+        date: bookingData.date 
+    });
+
+    if (exists) {
+        return res.status(409).send({ message: 'You have already booked this workspace for the selected date!' });
     }
-    const result = await bookings.insertOne(bookingData)
-    console.log('New Booking', bookingData)
-    res.send(result)
-})
+    const result = await bookings.insertOne(bookingData);
+    console.log('New Booking', bookingData);
+    res.send(result);
+});
 
 app.listen(PORT, ()=> {
     console.log('server running at port', PORT)
