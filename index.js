@@ -100,10 +100,36 @@ app.patch("/studios/edit/:id", async (req, res) => {
   res.send(result);
 });
 
+app.patch("/status/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  const updateBooking = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      ...updateBooking
+    },
+  };
+  console.log(updateDoc)
+
+  const result = await bookings.updateOne(query, updateDoc);
+  console.log(result)
+
+  res.send(result);
+});
+
 app.delete('/delete/:id', async(req, res) => {
     const id = req.params.id
     const query = { _id: new ObjectId(id) };
     const result = await studios.deleteOne(query)
+    res.send(result)
+})
+
+app.delete('/bookings/:id', async(req, res) => {
+    const id = req.params.id
+    console.log('booking delete', id)
+    const query = { _id: new ObjectId(id) };
+    const result = await bookings.deleteOne(query)
     res.send(result)
 })
 
@@ -114,6 +140,11 @@ app.get('/feature', async(req, res)=> {
     res.send(featured)
 })
 
+app.get('/bookings/:email', async(req, res)=> {
+    const userEmail = req.params.email;
+    const result = await bookings.find({email: userEmail}).toArray()
+    res.send(result)
+})
 
 
 
@@ -126,6 +157,10 @@ app.post('/add-studio', async(req, res) => {
 
 app.post('/bookings', async(req, res)=> {
     const bookingData = req.body;
+    const exits = bookings.find({_id: new ObjectId(bookingData._id)})
+    if(exits && bookingData.status !== 'pending'){
+        return res.send({message: 'Data already exists!'})
+    }
     const result = await bookings.insertOne(bookingData)
     console.log('New Booking', bookingData)
     res.send(result)
