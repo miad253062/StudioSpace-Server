@@ -27,6 +27,7 @@ export async function connectToMongoDB() {
 const connectedClient = await connectToMongoDB();
 const database = connectedClient.db('StudioSpaceServer')
 const studios = database.collection('studios')
+const bookings = database.collection('bookings')
 
 
 
@@ -80,6 +81,7 @@ app.get('/studios/:id', async(req, res)=> {
     }
 })
 
+
 app.patch("/studios/edit/:id", async (req, res) => {
   const id = req.params.id;
   console.log(id)
@@ -120,6 +122,13 @@ app.post('/add-studio', async(req, res) => {
     const adddata = await studios.insertOne(newData)
     console.log('New Studio', adddata.insertedId)
     res.send(adddata)
+})
+
+app.post('/bookings', async(req, res)=> {
+    const bookingData = req.body;
+    const result = await bookings.insertOne(bookingData)
+    console.log('New Booking', bookingData)
+    res.send(result)
 })
 
 app.listen(PORT, ()=> {
