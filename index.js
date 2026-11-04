@@ -40,11 +40,9 @@ app.get('/', (req, res) => {
 const verifyApi = async(req, res, next) => {
 
     const authHeader = req.headers.authorization;
-    console.log('authorized', authHeader)
 
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('No token found in request headers');
         return res.status(401).send({ message: 'Unauthorized access: Token missing' });
     }
     const token = authHeader.split(' ')[1];
@@ -76,8 +74,7 @@ app.get('/studios', async(req, res) => {
 });
 
 app.get('/my-listing/:email', async(req, res) => {
-    const userEmail = req.params.email
-    console.log(userEmail)
+    const userEmail = req.params.email.trim()
     const result = await studios.find({email: userEmail}).toArray()
     res.send(result)
 })
@@ -85,7 +82,6 @@ app.get('/my-listing/:email', async(req, res) => {
 
 app.get('/studios/edit/:id', async(req, res) => {
     const id = req.params.id
-    console.log(id)
     const result = await studios.findOne({_id: new ObjectId(id)})
     if(result){
         res.send(result)
@@ -107,7 +103,6 @@ app.get('/studios/:id', async(req, res)=> {
 
 app.patch("/studios/edit/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id)
   const updateUser = req.body;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
@@ -115,17 +110,14 @@ app.patch("/studios/edit/:id", async (req, res) => {
       ...updateUser
     },
   };
-  console.log(updateDoc)
 
   const result = await studios.updateOne(query, updateDoc);
-  console.log(result)
 
   res.send(result);
 });
 
 app.patch("/status/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id)
   const updateBooking = req.body;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
@@ -133,10 +125,8 @@ app.patch("/status/:id", async (req, res) => {
       ...updateBooking
     },
   };
-  console.log(updateDoc)
 
   const result = await bookings.updateOne(query, updateDoc);
-  console.log(result)
 
   res.send(result);
 });
@@ -148,9 +138,8 @@ app.delete('/delete/:id', verifyApi, async(req, res) => {
     res.send(result)
 })
 
-app.delete('/bookings/:id', async(req, res) => {
+app.delete('/bookings/:id', verifyApi, async(req, res) => {
     const id = req.params.id
-    console.log('booking delete', id)
     const query = { _id: new ObjectId(id) };
     const result = await bookings.deleteOne(query)
     res.send(result)
@@ -174,7 +163,6 @@ app.get('/bookings/:email', async(req, res)=> {
 app.post('/add-studio',verifyApi,  async(req, res) => {
     const newData = req.body;
     const adddata = await studios.insertOne(newData)
-    console.log('New Studio', adddata.insertedId)
     res.send(adddata)
 })
 
@@ -190,7 +178,6 @@ app.post('/bookings', verifyApi, async(req, res) => {
         return res.status(409).send({ message: 'You have already booked this workspace for the selected date!' });
     }
     const result = await bookings.insertOne(bookingData);
-    console.log('New Booking', bookingData);
     res.send(result);
 });
 
