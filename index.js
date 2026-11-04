@@ -131,14 +131,14 @@ app.patch("/status/:id", async (req, res) => {
   res.send(result);
 });
 
-app.delete('/delete/:id', async(req, res) => {
+app.delete('/delete/:id', verifyApi, async(req, res) => {
     const id = req.params.id
     const query = { _id: new ObjectId(id) };
     const result = await studios.deleteOne(query)
     res.send(result)
 })
 
-app.delete('/bookings/:id', async(req, res) => {
+app.delete('/bookings/:id', verifyApi, async(req, res) => {
     const id = req.params.id
     const query = { _id: new ObjectId(id) };
     const result = await bookings.deleteOne(query)
@@ -160,13 +160,13 @@ app.get('/bookings/:email', async(req, res)=> {
 
 
 
-app.post('/add-studio',  async(req, res) => {
+app.post('/add-studio',verifyApi,  async(req, res) => {
     const newData = req.body;
     const adddata = await studios.insertOne(newData)
     res.send(adddata)
 })
 
-app.post('/bookings', async(req, res) => {
+app.post('/bookings', verifyApi, async(req, res) => {
     const bookingData = req.body;
     const exists = await bookings.findOne({ 
         email: bookingData.email, 
