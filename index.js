@@ -184,3 +184,6 @@ app.post('/bookings', verifyApi, async(req, res) => {
 app.listen(PORT, ()=> {
     console.log('server running at port', PORT)
 })
+
+
+export default app;

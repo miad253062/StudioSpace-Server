@@ -14,8 +14,8 @@ Single-file Express 5 API for the StudioSpace course project. The frontend is a 
 
 ## Auth
 
-- The `verifyApi` JWT middleware is applied to only three routes: `POST /add-studio`, `POST /bookings`, `DELETE /delete/:id`. Everything else is unauthenticated.
-- It verifies Bearer tokens against `${CLIENT_URL}/api/auth/jwks`, served by the sibling client's better-auth catch-all (`src/app/api/auth/[...all]/route.ts`). The client dev server (`npm run dev` in `../studio-space-client`, port 3000) must be running for those three routes to succeed — otherwise they return 401.
+- The `verifyApi` JWT middleware is applied to four routes: `POST /add-studio`, `POST /bookings`, `DELETE /delete/:id`, `DELETE /bookings/:id`. Everything else is unauthenticated.
+- It verifies Bearer tokens against `${CLIENT_URL}/api/auth/jwks`, served by the sibling client's better-auth catch-all (`src/app/api/auth/[...all]/route.ts`). The client dev server (`npm run dev` in `../studio-space-client`, port 3000) must be running for those four routes to succeed — otherwise they return 401.
 - `CLIENT_URL` must be the bare origin with **no trailing slash** (the URL is built as `${CLIENT_URL}/api/auth/jwks`).
 
 ## Code style & conventions
